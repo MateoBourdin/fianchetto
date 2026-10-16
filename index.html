@@ -43,6 +43,7 @@
       <span><small>Problèmes</small><b id="hdr-puzzle">1200</b></span>
     </div>
     <div class="engine-pill" id="engine-status" data-state="loading"><i></i><span class="label">Moteur…</span></div>
+    <button type="button" class="legal-link idea-link" data-feedback title="Proposer une idée ou signaler un bug" aria-label="Proposer une idée ou signaler un bug"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg></button>
     <a class="legal-link" href="legal.html" title="Mentions légales, confidentialité et licences" aria-label="Mentions légales, confidentialité et licences"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg></a>
   </div>
 </header>
@@ -236,9 +237,9 @@
           <button class="btn btn-ghost icon" id="an-last" title="Fin (↓)">⏭</button>
           <span class="sep"></span>
           <button class="btn btn-ghost icon" id="an-flip" title="Retourner (F)">⇅</button>
-          <button class="btn btn-ghost toggle" id="an-best-toggle" aria-pressed="true" title="Flèche du meilleur coup">➚ Meilleur</button>
-          <button class="btn btn-ghost toggle" id="an-threats" aria-pressed="false" title="Montrer la menace adverse (T)">⚠ Menaces</button>
-          <button class="btn btn-ghost" id="an-play-here" title="Jouer cette position contre un bot">♞ Jouer d'ici</button>
+          <button class="btn btn-ghost toggle" id="an-best-toggle" aria-pressed="true" title="Flèche du meilleur coup" aria-label="Flèche du meilleur coup">➚<span class="lbl"> Meilleur</span></button>
+          <button class="btn btn-ghost toggle" id="an-threats" aria-pressed="false" title="Montrer la menace adverse (T)" aria-label="Menaces adverses">⚠<span class="lbl"> Menaces</span></button>
+          <button class="btn btn-ghost" id="an-play-here" title="Jouer cette position contre un bot" aria-label="Jouer d'ici contre un bot">♞<span class="lbl"> Jouer d'ici</span></button>
         </div>
         <div class="graph" id="an-graph"></div>
       </div>
@@ -378,6 +379,7 @@
         <h2 class="panel-title">À propos</h2>
         <p>Fianchetto est un projet personnel indépendant, sans lien avec Chess.com ni Lichess. Les parties sont récupérées via leurs API publiques ; aucune donnée n'est envoyée ailleurs, tout reste dans ton navigateur.</p>
         <p class="muted">Moteur : Stockfish (GPL-3.0) via stockfish.js · Règles : chess.js (BSD-2) · Pièces : Cburnett, Wikimedia Commons (CC BY-SA 3.0) · Problèmes : base Lichess (CC0) · Formules de probabilité de gain et de précision : publiées par Lichess.</p>
+        <button type="button" class="btn btn-primary fb-open" data-feedback>💡 Proposer une idée ou signaler un bug</button>
         <p><a href="legal.html">Mentions légales, confidentialité et licences</a> · <a href="https://github.com/MateoBourdin/fianchetto" rel="noopener">Code source (GPL-3.0)</a> · <a href="https://mateobourdin.github.io/" rel="noopener">Portfolio de l’auteur</a></p>
       </div>
     </div>

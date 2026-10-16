@@ -8,6 +8,7 @@ import { loadPieceSprite } from './ui/board.js';
 import { injectIconSprite } from './ui/icons.js';
 import { $, $$, toast } from './ui/common.js';
 import { store } from './store.js';
+import { initFeedback } from './ui/feedback.js';
 import * as play from './views/play.js';
 import * as analysis from './views/analysis.js';
 import * as puzzles from './views/puzzles.js';
@@ -79,9 +80,11 @@ async function main() {
   window.addEventListener('hashchange', () => showView(location.hash.slice(1)));
   document.addEventListener('keydown', (e) => {
     if (/input|textarea|select/i.test(e.target.tagName)) return;
+    if (e.target.closest && e.target.closest('.modal')) return;
     if (current && current.onKey) current.onKey(e);
   });
 
+  initFeedback();
   showView(location.hash.slice(1) || 'jouer');
   document.body.classList.remove('booting');
   bootEngines();

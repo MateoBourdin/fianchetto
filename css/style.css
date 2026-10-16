@@ -757,3 +757,76 @@ main.wide { max-width: none; padding: 14px 18px 16px; }
 .legal-link { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; color: var(--muted); border: 1px solid var(--line); background: var(--surface); flex: none; }
 .legal-link:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 .legal-link svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+/* ---------- Barre de navigation sous l'échiquier : jamais de chevauchement ----------
+   Les libellés passent en icônes quand la place manque, puis la barre passe sur deux lignes. */
+.rv-center .nav-row { container-type: inline-size; flex-wrap: wrap; row-gap: 6px; }
+.nav-row .btn, .nav-row .ply-label, .nav-row .sep { flex-shrink: 0; }
+@container (max-width: 640px) {
+  .nav-row .lbl { display: none; }
+  .nav-row .btn { padding: 7px 9px; min-width: 38px; }
+  .nav-row .ply-label { min-width: 70px; }
+}
+@container (max-width: 420px) {
+  .nav-row .sep { display: none; }
+}
+/* Barres des joueurs : le nom reste lisible, les pièces prises cèdent la place */
+.rv-player strong { flex: 0 1 auto; min-width: 3ch; max-width: 55%; }
+.rv-player > .muted { flex: none; }
+.rv-player .captured { flex: 1 1 0; min-width: 0; }
+.rv-player .clock { flex: none; }
+/* Barre supérieure : rien ne déborde entre 760 et 1100 px */
+@media (max-width: 1100px) and (min-width: 761px) {
+  .topbar { gap: 14px; }
+  .nav { gap: 2px; }
+  .nav a { padding-left: 10px; padding-right: 10px; }
+  .rating-chip { display: none; }
+}
+.topbar-right { flex-shrink: 0; }
+/* Colonne d'outils sous l'échiquier (≤ 1280 px) : boutons à leur hauteur naturelle */
+@media (max-width: 1280px) {
+  .rv-left { align-items: start; }
+  .rv-tools { align-content: start; grid-auto-rows: min-content; }
+}
+@media (max-width: 880px) and (min-width: 761px) {
+  .nav a span { display: none; }
+}
+
+/* ---------- Boîte à idées ---------- */
+.idea-link { cursor: pointer; padding: 0; }
+.credits .fb-open { margin: 4px 0 10px; }
+.feedback-card { width: min(560px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; text-align: left; padding: 22px 24px; }
+.fb-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fb-head h2 { margin: 0; font-size: 20px; }
+.fb-head .icon-btn { font-size: 16px; color: var(--muted); }
+.fb-intro { margin: 6px 0 12px; }
+.fb-kind { flex-wrap: wrap; }
+.fb-kind label { flex: 1 1 auto; position: relative; cursor: pointer; }
+.fb-kind input { position: absolute; opacity: 0; pointer-events: none; }
+.fb-kind span { display: block; text-align: center; padding: 8px 10px; border-radius: 8px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+.fb-kind input:checked + span { background: var(--surface-3); color: var(--text); box-shadow: inset 0 0 0 1px #3a4458; }
+.fb-kind input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+.feedback-card textarea { width: 100%; font-family: var(--font); font-size: 14px; min-height: 120px; }
+.feedback-card input[type="text"], .feedback-card input[type="email"] { width: 100%; }
+.feedback-card input[type="email"] { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-2); outline: none; }
+.feedback-card input[type="email"]:focus, .feedback-card textarea:focus, .feedback-card input[type="text"]:focus { border-color: var(--accent); }
+.fb-count { text-align: right; font-size: 11px; margin-top: 4px; }
+.fb-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fb-row .field-label { margin-top: 8px; }
+.fb-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.fb-privacy { font-size: 12px; line-height: 1.5; margin: 14px 0; }
+.feedback-card .btn-row { justify-content: flex-end; }
+.feedback-card .btn-row .btn { flex: 0 0 auto; }
+.fb-status { margin: 10px 0 0; font-size: 13px; min-height: 1em; }
+.fb-status.err { color: #ff8a87; }
+@media (max-width: 560px) {
+  .fb-row { grid-template-columns: 1fr; }
+  .feedback-card { padding: 18px 16px; }
+}
+/* Petits écrans : la pastille du moteur se réduit à son voyant */
+@media (max-width: 480px) {
+  .topbar { gap: 8px; }
+  .topbar-right { gap: 8px; }
+  .engine-pill { padding: 6px 10px; }
+  .engine-pill .label { display: none; }
+}
