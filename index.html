@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr" data-board="sable">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fianchetto — Analyse de parties et entraînement aux échecs</title>
+  <meta name="description" content="Joue contre des bots, importe tes parties Chess.com ou Lichess et obtiens un rapport d'analyse complet avec Stockfish, directement dans ton navigateur.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%20%20%3Cdefs%3E%20%20%20%20%3ClinearGradient%20id%3D%22fz-b%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23ffd683%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ee9f22%22/%3E%3C/linearGradient%3E%20%20%3C/defs%3E%20%20%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%23151a24%22/%3E%20%20%3Cpath%20d%3D%22M4.5%2027.5%2027.5%204.5%22%20stroke%3D%22%23f4b740%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.13%22/%3E%20%20%3Crect%20x%3D%223.4%22%20y%3D%2223.6%22%20width%3D%225%22%20height%3D%225%22%20rx%3D%221.2%22%20fill%3D%22%23f4b740%22%20opacity%3D%22.55%22/%3E%20%20%3Crect%20x%3D%2223.6%22%20y%3D%223.4%22%20width%3D%225%22%20height%3D%225%22%20rx%3D%221.2%22%20fill%3D%22%23f4b740%22%20opacity%3D%22.55%22/%3E%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%226.6%22%20r%3D%221.8%22%20fill%3D%22url%28%23fz-b%29%22/%3E%20%20%3Cpath%20d%3D%22M16%208.6c3.7%202.3%205.3%205.4%204.5%208.4-.4%201.7-1.9%202.8-4.5%202.8s-4.1-1.1-4.5-2.8c-.8-3%20.8-6.1%204.5-8.4z%22%20fill%3D%22url%28%23fz-b%29%22/%3E%20%20%3Cpath%20d%3D%22M18.1%2011.5%2015.3%2015%22%20stroke%3D%22%23151a24%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22/%3E%20%20%3Crect%20x%3D%2212.3%22%20y%3D%2220.7%22%20width%3D%227.4%22%20height%3D%221.7%22%20rx%3D%22.85%22%20fill%3D%22url%28%23fz-b%29%22/%3E%20%20%3Cpath%20d%3D%22M11.4%2023.4h9.2l1.6%202.9a.8.8%200%200%201-.7%201.2H10.5a.8.8%200%200%201-.7-1.2z%22%20fill%3D%22url%28%23fz-b%29%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="vendor/chess.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body class="booting">
+
+<header class="topbar">
+  <a class="brand" href="#jouer" data-nav="jouer">
+    <svg class="logo" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+  <defs>
+    <linearGradient id="fz-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd683"/><stop offset="1" stop-color="#ee9f22"/></linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="#151a24"/>
+  <path d="M4.5 27.5 27.5 4.5" stroke="#f4b740" stroke-width="5" stroke-linecap="round" opacity=".13"/>
+  <rect x="3.4" y="23.6" width="5" height="5" rx="1.2" fill="#f4b740" opacity=".55"/>
+  <rect x="23.6" y="3.4" width="5" height="5" rx="1.2" fill="#f4b740" opacity=".55"/>
+  <circle cx="16" cy="6.6" r="1.8" fill="url(#fz-b)"/>
+  <path d="M16 8.6c3.7 2.3 5.3 5.4 4.5 8.4-.4 1.7-1.9 2.8-4.5 2.8s-4.1-1.1-4.5-2.8c-.8-3 .8-6.1 4.5-8.4z" fill="url(#fz-b)"/>
+  <path d="M18.1 11.5 15.3 15" stroke="#151a24" stroke-width="1.6" stroke-linecap="round"/>
+  <rect x="12.3" y="20.7" width="7.4" height="1.7" rx=".85" fill="url(#fz-b)"/>
+  <path d="M11.4 23.4h9.2l1.6 2.9a.8.8 0 0 1-.7 1.2H10.5a.8.8 0 0 1-.7-1.2z" fill="url(#fz-b)"/>
+</svg>
+    <span>Fianchetto</span>
+  </a>
+  <nav class="nav">
+    <a href="#jouer" data-nav="jouer"><svg viewBox="0 0 24 24"><path d="M8 21h8M9 17h6l1-5H8zM12 3v3M10 4.5h4M9 12c-1-1.5-1-3.5 0-5h6c1 1.5 1 3.5 0 5"/></svg><span>Jouer</span></a>
+    <a href="#analyse" data-nav="analyse"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg><span>Analyse</span></a>
+    <a href="#problemes" data-nav="problemes"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg><span>Problèmes</span></a>
+    <a href="#profil" data-nav="profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Profil</span></a>
+  </nav>
+  <div class="topbar-right">
+    <div class="rating-chip" title="Classement parties / problèmes">
+      <span><small>Parties</small><b id="hdr-elo">1200</b></span>
+      <span><small>Problèmes</small><b id="hdr-puzzle">1200</b></span>
+    </div>
+    <div class="engine-pill" id="engine-status" data-state="loading"><i></i><span class="label">Moteur…</span></div>
+  </div>
+</header>
+
+<div id="toasts" aria-live="polite"></div>
+
+<main>
+
+  <!-- ====================== JOUER ====================== -->
+  <section class="view" id="view-jouer" data-phase="setup">
+    <div class="layout-board">
+      <div class="board-col">
+        <div class="player-bar" id="play-top"></div>
+        <div class="board-wrap">
+          <div id="play-evalbar"></div>
+          <div class="board-box"><div id="play-board"></div></div>
+        </div>
+        <div class="player-bar" id="play-bottom"></div>
+      </div>
+
+      <aside class="side">
+        <div class="panel setup-only">
+          <div class="custom-banner" id="play-custom" hidden>
+            <span>♟ Partie depuis une position de ton analyse</span>
+            <button class="btn btn-ghost btn-sm" id="play-custom-clear">Position normale</button>
+          </div>
+          <h2 class="panel-title">Choisis ton adversaire</h2>
+          <div id="bot-list" class="bot-list"></div>
+          <div id="bot-bio" class="bot-bio"></div>
+          <div class="field-label">Tu joues</div>
+          <div class="seg" id="play-color">
+            <button data-color="w" class="active"><span class="dot w"></span>Blancs</button>
+            <button data-color="r">Aléatoire</button>
+            <button data-color="b"><span class="dot b"></span>Noirs</button>
+          </div>
+          <button class="btn btn-primary btn-block btn-lg" id="play-start">Commencer la partie</button>
+        </div>
+
+        <div class="panel game-only">
+          <div class="status" id="play-status">À toi de jouer</div>
+          <div class="live-acc"><span>Ta précision en direct</span><b id="play-live-acc">—</b></div>
+          <div class="moves" id="play-moves"></div>
+          <div class="btn-row playing-only">
+            <button class="btn" id="play-undo" title="Reprendre le dernier coup">↶ Reprendre</button>
+            <button class="btn" id="play-hint" title="Montre le meilleur coup">💡 Indice</button>
+            <button class="btn btn-ghost" id="play-flip" title="Retourner l'échiquier (F)">⇅</button>
+            <button class="btn btn-danger" id="play-resign">Abandonner</button>
+          </div>
+          <div class="btn-row over-only">
+            <button class="btn btn-primary" id="play-review">Analyser la partie</button>
+            <button class="btn" id="play-new">Nouvelle partie</button>
+          </div>
+        </div>
+
+        <div class="panel legend">
+          <h2 class="panel-title">Légende</h2>
+          <ul class="legend-list" id="legend-list"></ul>
+        </div>
+      </aside>
+    </div>
+
+    <div class="modal" id="result-modal" hidden>
+      <div class="modal-card">
+        <div class="result-icon"></div>
+        <h2 id="result-title">Victoire</h2>
+        <p id="result-reason" class="muted"></p>
+        <p id="result-elo" class="result-elo"></p>
+        <div class="btn-col">
+          <button class="btn btn-primary btn-lg" id="result-review">Analyser la partie</button>
+          <button class="btn" id="result-again">Rejouer</button>
+          <button class="btn btn-ghost" id="result-close">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== ANALYSE ====================== -->
+  <section class="view" id="view-analyse" data-mode="import">
+
+    <!-- Import -->
+    <div class="import-layout mode-import">
+      <div class="panel import-panel">
+        <h1 class="hero-title">Analyse tes parties, <em>sans limite</em>.</h1>
+        <p class="hero-sub">Importe tes parties Chess.com ou Lichess : Stockfish tourne directement dans ton navigateur et rédige un rapport coup par coup. Aucun compte, aucune donnée envoyée.</p>
+
+        <div class="tabs" id="import-tabs">
+          <button data-tab="chesscom" class="active">Chess.com</button>
+          <button data-tab="lichess">Lichess</button>
+          <button data-tab="pgn">PGN</button>
+        </div>
+
+        <div class="import-pane active" data-pane="chesscom">
+          <form id="cc-form" class="inline-form">
+            <input id="cc-user" type="text" placeholder="Ton pseudo Chess.com" autocomplete="username" spellcheck="false">
+            <select id="cc-month" class="select month" hidden></select>
+            <button class="btn btn-primary" type="submit">Charger</button>
+          </form>
+        </div>
+        <div class="import-pane" data-pane="lichess">
+          <form id="li-form" class="inline-form">
+            <input id="li-user" type="text" placeholder="Ton pseudo Lichess" spellcheck="false">
+            <button class="btn btn-primary" type="submit">Charger</button>
+          </form>
+        </div>
+        <div class="import-pane" data-pane="pgn">
+          <form id="pgn-form">
+            <textarea id="pgn-text" rows="6" placeholder="Colle ton PGN ici, ou glisse-dépose un fichier .pgn sur la page&#10;[Event &quot;...&quot;]&#10;1. e4 e5 2. Nf3 Nc6 ..."></textarea>
+            <div class="inline-form">
+              <label class="file-btn btn">Ouvrir un fichier .pgn<input id="pgn-file" type="file" accept=".pgn,text/plain" hidden></label>
+              <select id="pgn-color" class="select" title="Ton camp"><option value="w">J'avais les Blancs</option><option value="b">J'avais les Noirs</option></select>
+              <button class="btn btn-primary" type="submit">Analyser</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="list-tools">
+          <div class="filters" id="game-filters">
+            <button data-filter="all" class="active">Toutes</button>
+            <button data-filter="bullet">Bullet</button>
+            <button data-filter="blitz">Blitz</button>
+            <button data-filter="rapid">Rapide</button>
+            <button data-filter="daily">Différé</button>
+          </div>
+          <div class="batch-box" id="batch-box" hidden>
+            <select id="batch-count" class="select sm"></select>
+            <button class="btn btn-accent-soft" id="batch-start">📊 Bilan de ces parties</button>
+          </div>
+        </div>
+        <div class="game-list" id="game-list"><div class="list-state">Entre ton pseudo pour afficher tes dernières parties.</div></div>
+      </div>
+
+      <aside class="side">
+        <div class="panel">
+          <h2 class="panel-title">Profondeur d'analyse</h2>
+          <select id="an-depth" class="select"></select>
+          <p class="hint">« Standard » convient à la plupart des parties ; « Approfondie » est plus précise mais plus lente. Les erreurs sont toujours revérifiées plus en profondeur.</p>
+        </div>
+        <div class="panel">
+          <h2 class="panel-title">Analyses récentes</h2>
+          <div id="an-recent" class="recent"></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Progression -->
+    <div class="mode-progress progress-wrap">
+      <div class="panel progress-card">
+        <span class="spinner lg"></span>
+        <h2 id="an-progress-title">Analyse en cours</h2>
+        <div class="progress"><i id="an-progress-bar"></i></div>
+        <p id="an-progress-label" class="muted">…</p>
+        <button class="btn btn-ghost" id="an-cancel">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Rapport : 3 colonnes, tout visible sans défiler -->
+    <div class="review mode-review">
+      <aside class="rv-left">
+        <div class="panel rv-acc">
+          <div class="acc-grid" id="an-acc"></div>
+          <table class="counts"><tbody id="an-counts"></tbody></table>
+        </div>
+        <div class="panel rv-more">
+          <table class="counts phases"><tbody id="an-phases"></tbody></table>
+          <div class="rv-opening"><small>Ouverture</small><span id="an-opening"></span></div>
+          <div class="rv-key"><small>Moments clés</small><div id="an-key" class="key-list"></div></div>
+        </div>
+        <div class="panel rv-tools">
+          <button class="btn btn-primary" id="an-train">↻ Corriger mes erreurs</button>
+          <button class="btn" id="rv-guess">🎯 Devine le coup</button>
+          <button class="btn" id="rv-share-game" title="Image du rapport à partager">⇪ Partager</button>
+          <button class="btn" id="an-export" title="PGN annoté avec les commentaires">⤓ PGN annoté</button>
+          <button class="btn btn-ghost" id="an-import-new">← Autre partie</button>
+          <button class="btn btn-ghost" id="an-back-batch" hidden>← Bilan</button>
+          <div id="an-source" class="source-link"></div>
+        </div>
+      </aside>
+
+      <div class="rv-center">
+        <div class="player-bar rv-player" id="rv-top"></div>
+        <div class="board-wrap">
+          <div id="an-evalbar"></div>
+          <div class="board-box"><div id="an-board"></div></div>
+        </div>
+        <div class="player-bar rv-player" id="rv-bottom"></div>
+        <div class="nav-row">
+          <button class="btn btn-ghost icon" id="an-first" title="Début (↑)">⏮</button>
+          <button class="btn icon" id="an-prev" title="Précédent (←)">◀</button>
+          <span id="an-ply" class="ply-label">—</span>
+          <button class="btn icon" id="an-next" title="Suivant (→)">▶</button>
+          <button class="btn btn-ghost icon" id="an-last" title="Fin (↓)">⏭</button>
+          <span class="sep"></span>
+          <button class="btn btn-ghost icon" id="an-flip" title="Retourner (F)">⇅</button>
+          <button class="btn btn-ghost toggle" id="an-best-toggle" aria-pressed="true" title="Flèche du meilleur coup">➚ Meilleur</button>
+          <button class="btn btn-ghost toggle" id="an-threats" aria-pressed="false" title="Montrer la menace adverse (T)">⚠ Menaces</button>
+          <button class="btn btn-ghost" id="an-play-here" title="Jouer cette position contre un bot">♞ Jouer d'ici</button>
+        </div>
+        <div class="graph" id="an-graph"></div>
+      </div>
+
+      <aside class="rv-right">
+        <div class="panel coach" id="an-coach"></div>
+        <div class="panel rv-engine">
+          <div class="rv-engine-head">
+            <span class="panel-title">Stockfish <span id="rv-lines-depth" class="muted"></span></span>
+            <label class="mini-switch" title="Lignes moteur en direct"><input type="checkbox" id="rv-lines-toggle" checked><i></i></label>
+          </div>
+          <div id="rv-lines" class="lines"></div>
+        </div>
+        <div class="panel rv-moves">
+          <div id="rv-variation" class="variation" hidden></div>
+          <div class="moves" id="an-moves"></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Bilan multi-parties -->
+    <div class="mode-batch batch" data-mode-batch>
+      <div class="batch-head">
+        <div>
+          <h1 class="hero-title sm" id="batch-title">Bilan</h1>
+          <div class="batch-progress" id="batch-progress"><div class="progress"><i id="batch-bar"></i></div><span id="batch-label" class="muted"></span>
+            <button class="btn btn-ghost btn-sm" id="batch-cancel">Arrêter</button></div>
+        </div>
+        <button class="btn" id="batch-back">← Retour à la liste</button>
+      </div>
+      <div class="kpis" id="batch-kpis"></div>
+      <div class="batch-grid">
+        <div class="panel"><h2 class="panel-title">Précision partie par partie</h2><div id="batch-trend"></div></div>
+        <div class="panel"><h2 class="panel-title">Conseils personnalisés</h2><ul class="tips" id="batch-tips"></ul></div>
+        <div class="panel"><h2 class="panel-title">Précision par phase</h2><div id="batch-phases"></div>
+          <h2 class="panel-title mt">Types d'erreurs</h2><div id="batch-errors"></div></div>
+        <div class="panel"><h2 class="panel-title">Tes ouvertures</h2><div id="batch-openings"></div></div>
+        <div class="panel span2"><h2 class="panel-title">Parties analysées</h2><div class="game-list" id="batch-games"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== PROBLÈMES ====================== -->
+  <section class="view" id="view-problemes">
+    <div class="layout-board">
+      <div class="board-col">
+        <div class="pz-head panel">
+          <div>
+            <div class="pz-turn" id="pz-turn"></div>
+            <div class="pz-task" id="pz-task"></div>
+          </div>
+          <div class="pz-meta"><span id="pz-rating"></span><span id="pz-title" class="muted"></span></div>
+        </div>
+        <div class="board-wrap">
+          <div class="board-box">
+            <div id="pz-board"></div>
+            <div class="board-loading" id="pz-loading" hidden><span class="spinner lg"></span><span id="pz-loading-label"></span></div>
+          </div>
+        </div>
+        <div class="pz-feedback" id="pz-feedback" hidden></div>
+        <div class="btn-row center">
+          <button class="btn" id="pz-hint">Indice</button>
+          <button class="btn" id="pz-solution">Solution</button>
+          <button class="btn" id="pz-retry">Recommencer</button>
+          <button class="btn btn-primary" id="pz-next">Problème suivant</button>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="panel">
+          <div class="big-stat"><small>Classement problèmes</small><b id="pz-elo">1200</b></div>
+          <div class="stat-grid">
+            <div><small>Résolus</small><b id="pz-solved">0</b></div>
+            <div><small>Série</small><b id="pz-streak">0</b></div>
+            <div><small>Record</small><b id="pz-best">0</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2 class="panel-title">Source</h2>
+          <div class="seg vertical" id="pz-sources">
+            <button data-src="lichess" class="active">Base Lichess <small>3 M+ problèmes, en ligne</small></button>
+            <button data-src="local">Classiques <small>pièges célèbres, hors-ligne</small></button>
+            <button data-src="mine">Mes erreurs <small>positions de tes parties analysées</small></button>
+          </div>
+          <div id="pz-filters">
+            <div class="field-label">Thème</div>
+            <select id="pz-theme" class="select"></select>
+            <div class="field-label">Difficulté</div>
+            <select id="pz-diff" class="select"></select>
+          </div>
+        </div>
+        <div class="panel">
+          <h2 class="panel-title">Thèmes</h2>
+          <div id="pz-themes" class="tags"></div>
+          <div id="pz-link" class="source-link"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ====================== PROFIL ====================== -->
+  <section class="view" id="view-profil">
+    <div class="profile-layout">
+      <div class="panel">
+        <h2 class="panel-title">Classements</h2>
+        <div class="stat-grid wide">
+          <div><small>Parties vs bots</small><b id="pf-elo">1200</b></div>
+          <div><small>Problèmes</small><b id="pf-pelo">1200</b></div>
+          <div><small>Parties jouées</small><b id="pf-games">0</b></div>
+          <div><small>V / N / D</small><b id="pf-wdl">0</b></div>
+          <div><small>Réussite problèmes</small><b id="pf-prate">—</b></div>
+          <div><small>Meilleure série</small><b id="pf-pbest">0</b></div>
+        </div>
+        <h3 class="sub-title">Progression</h3>
+        <div id="pf-spark" class="spark"></div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Historique des analyses</h2>
+        <div id="pf-history"></div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel-title">Réglages</h2>
+        <div id="pf-settings"></div>
+        <div class="field-label">Couleurs de l'échiquier</div>
+        <div class="themes" id="pf-themes">
+          <button data-theme="sable"><i style="--l:#e6dcc6;--d:#6d8299"></i>Sable</button>
+          <button data-theme="menthe"><i style="--l:#e4ecdc;--d:#6f9a83"></i>Menthe</button>
+          <button data-theme="nuit"><i style="--l:#a9b3c6;--d:#46506a"></i>Nuit</button>
+          <button data-theme="corail"><i style="--l:#f1e3d6;--d:#c9826b"></i>Corail</button>
+        </div>
+        <button class="btn btn-danger" id="pf-reset">Réinitialiser le profil</button>
+      </div>
+
+      <div class="panel credits">
+        <h2 class="panel-title">À propos</h2>
+        <p>Fianchetto est un projet personnel indépendant, sans lien avec Chess.com ni Lichess. Les parties sont récupérées via leurs API publiques ; aucune donnée n'est envoyée ailleurs, tout reste dans ton navigateur.</p>
+        <p class="muted">Moteur : Stockfish (GPL-3.0) via stockfish.js · Règles : chess.js (BSD-2) · Pièces : Cburnett, Wikimedia Commons (CC BY-SA 3.0) · Problèmes : base Lichess (CC0) · Formules de probabilité de gain et de précision : publiées par Lichess.</p>
+      </div>
+    </div>
+  </section>
+  <div class="modal" id="share-modal" hidden>
+    <div class="modal-card share-card">
+      <div class="share-preview" id="share-preview"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="share-download">⤓ Télécharger le PNG</button>
+        <button class="btn" id="share-copy">Copier l'image</button>
+        <button class="btn btn-ghost" id="share-close">Fermer</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <a href="#jouer" data-nav="jouer">Jouer</a>
+  <a href="#analyse" data-nav="analyse">Analyse</a>
+  <a href="#problemes" data-nav="problemes">Problèmes</a>
+  <a href="#profil" data-nav="profil">Profil</a>
+</nav>
+</body>
+</html>
