@@ -45,7 +45,7 @@ export function init(a) {
   depthSel.value = String(store.settings.reviewDepth);
   depthSel.addEventListener('change', () => { store.settings.reviewDepth = +depthSel.value; save(); });
 
-  $('#an-cancel').addEventListener('click', () => { if (running) running.cancelled = true; app.engines.analysis.cancelAll(); });
+  $('#an-cancel').addEventListener('click', () => { if (running) running.cancelled = true; app.engines.review.cancelAll(); });
   $('#an-import-new').addEventListener('click', () => setMode('import'));
   $('#an-export').addEventListener('click', exportPgn);
   $('#batch-start').addEventListener('click', startBatch);
@@ -193,7 +193,7 @@ async function openReview({ pgn, userColor = 'w', source = 'pgn', url = null }) 
   const cached = loadReview(id);
   if (cached) return display({ game, report: cached.report, userColor, meta: { id, source, url } });
 
-  if (running) { running.cancelled = true; app.engines.analysis.cancelAll(); }
+  if (running) { running.cancelled = true; app.engines.review.cancelAll(); }
   const job = { cancelled: false };
   running = job;
   setMode('progress');
@@ -204,7 +204,7 @@ async function openReview({ pgn, userColor = 'w', source = 'pgn', url = null }) 
   label.textContent = 'Démarrage du moteur…';
   const t0 = performance.now();
   try {
-    const positions = await analyzePositions(game, app.engines.analysis, {
+    const positions = await analyzePositions(game, app.engines.review, {
       depth, isCancelled: () => job.cancelled,
       onProgress: (done, total) => {
         bar.style.width = `${(done / total) * 90}%`;
@@ -213,7 +213,7 @@ async function openReview({ pgn, userColor = 'w', source = 'pgn', url = null }) 
         label.textContent = `Position ${done} / ${total} · ${eta > 0 ? `environ ${eta} s restantes` : 'vérification…'}`;
       },
     });
-    await refinePositions(game, positions, app.engines.analysis, {
+    await refinePositions(game, positions, app.engines.review, {
       depth, isCancelled: () => job.cancelled,
       onProgress: (done, total) => {
         bar.style.width = `${90 + done / total * 10}%`;

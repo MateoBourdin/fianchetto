@@ -152,6 +152,10 @@ function terminalEval(fen) {
  */
 export async function analyzePositions(game, engine, { depth = 14, onProgress = null, isCancelled = () => false } = {}) {
   const fens = [game.initialFen, ...game.moves.map((m) => m.fenAfter)];
+  // Pool de moteurs : positions réparties en blocs contigus, analysées en parallèle
+  if (engine && typeof engine.map === 'function') {
+    return engine.map(fens, (fen, eng) => analyzeOne(fen, eng, depth), { onProgress, isCancelled });
+  }
   const positions = [];
   for (let i = 0; i < fens.length; i++) {
     if (isCancelled()) throw new Error('cancelled');
@@ -161,10 +165,10 @@ export async function analyzePositions(game, engine, { depth = 14, onProgress = 
   return positions;
 }
 
-export async function analyzeOne(fen, engine, depth) {
+export async function analyzeOne(fen, engine, depth, maxTime = null) {
   const term = terminalEval(fen);
   if (term) return { fen, eval: term, lines: [] };
-  const res = await engine.analyse(fen, { depth, multipv: 2 });
+  const res = await engine.analyse(fen, { depth, multipv: 2, maxTime });
   const lines = res.lines.map((l) => ({ uci: l.uci, pv: l.pv, cp: l.cp, mate: l.mate }));
   const top = lines[0] || { cp: 0 };
   return { fen, eval: { cp: top.cp, mate: top.mate }, lines };
@@ -175,7 +179,7 @@ export async function analyzeOne(fen, engine, depth) {
  * (et les grosses imprécisions) sont ré-analysés plus profondément avant
  * d'être confirmés. Corrige les faux positifs dus à l'horizon du moteur.
  */
-export async function refinePositions(game, positions, engine, { depth = 14, extra = 4, onProgress = null, isCancelled = () => false } = {}) {
+export async function refinePositions(game, positions, engine, { depth = 14, extra = 4, maxTime = 1500, onProgress = null, isCancelled = () => false } = {}) {
   const prelim = [];
   for (let i = 0; i < game.moves.length; i++) prelim.push(classifyMove(game, positions, i, prelim));
   const targets = new Set();
@@ -185,10 +189,15 @@ export async function refinePositions(game, positions, engine, { depth = 14, ext
     }
   });
   const list = [...targets].sort((a, b) => a - b);
+  if (engine && typeof engine.map === 'function') {
+    const res = await engine.map(list, (idx, eng) => analyzeOne(positions[idx].fen, eng, depth + extra, maxTime), { onProgress, isCancelled });
+    list.forEach((idx, k) => { positions[idx] = res[k]; });
+    return list.length;
+  }
   for (let k = 0; k < list.length; k++) {
     if (isCancelled()) throw new Error('cancelled');
     const idx = list[k];
-    positions[idx] = await analyzeOne(positions[idx].fen, engine, depth + extra);
+    positions[idx] = await analyzeOne(positions[idx].fen, engine, depth + extra, maxTime);
     if (onProgress) onProgress(k + 1, list.length);
   }
   return list.length;

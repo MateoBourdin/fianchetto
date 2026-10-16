@@ -305,6 +305,7 @@ export class Board {
     const up = (ev) => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
       el.classList.remove('dragging');
       const to = this._squareAt(ev.clientX, ev.clientY);
       this._placeEl(el, rec.sq);
@@ -313,9 +314,18 @@ export class Board {
         this._tryMove(sq, to, true);
       }
     };
+    // Geste interrompu (appel, notification, multi-touch) : la pièce revient à sa case
+    const cancel = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
+      el.classList.remove('dragging');
+      this._placeEl(el, rec.sq);
+    };
     move(e);
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', cancel);
   }
 
   async _tryMove(from, to) {

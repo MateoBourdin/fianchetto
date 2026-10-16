@@ -830,3 +830,28 @@ main.wide { max-width: none; padding: 14px 18px 16px; }
   .engine-pill { padding: 6px 10px; }
   .engine-pill .label { display: none; }
 }
+
+/* ======================= Téléphones ======================= */
+@media (max-width: 760px) {
+  /* Analyse : navigation sur une ligne, outils (avec libellés) sur la suivante */
+  .rv-center .nav-row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); container-type: normal; gap: 6px; }
+  .rv-center .nav-row .sep { display: none; }
+  .rv-center .nav-row > * { min-width: 0; }
+  #an-first { grid-column: 1 / span 2; } #an-prev { grid-column: 3 / span 3; } #an-ply { grid-column: 6 / span 2; text-align: center; }
+  #an-next { grid-column: 8 / span 3; } #an-last { grid-column: 11 / span 2; }
+  #an-flip { grid-row: 2; grid-column: 1 / span 2; } #an-best-toggle { grid-row: 2; grid-column: 3 / span 3; }
+  #an-threats { grid-row: 2; grid-column: 6 / span 3; } #an-play-here { grid-row: 2; grid-column: 9 / span 4; }
+  .rv-center .nav-row .lbl { display: inline; }
+  .rv-center .nav-row .btn { min-height: 40px; padding: 8px 10px; }
+  .rv-center .graph { height: 56px; }
+  /* Le commentaire du coup juste sous l'échiquier, les listes ensuite */
+  .review { gap: 12px; }
+  .rv-moves { max-height: 300px; }
+  /* Boutons plus faciles à toucher */
+  .btn { min-height: 40px; }
+  .seg button { min-height: 40px; }
+}
+@media (max-width: 400px) {
+  .rv-center .nav-row .btn { padding: 8px 6px; font-size: 12.5px; }
+  .rv-center .nav-row .ply-label { min-width: 0; font-size: 11.5px; white-space: nowrap; letter-spacing: -.02em; }
+}

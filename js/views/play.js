@@ -36,6 +36,7 @@ let customFen = null; // position de départ venant de l'analyse
 export function init(a) {
   app = a;
   renderBots();
+  renderLegend();
   board = new Board($('#play-board'), { movable: null, onMove: onUserMove, showLegal: store.settings.showLegal });
   evalbar = new EvalBar($('#play-evalbar'));
 

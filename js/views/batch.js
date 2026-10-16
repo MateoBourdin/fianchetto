@@ -65,11 +65,11 @@ export async function runBatch(app, games, { depth = 10, onOpen }) {
       const id = gameId(game.moves.map((m) => m.san), depth);
       let report = (loadReview(id) || {}).report;
       if (!report) {
-        const positions = await analyzePositions(game, app.engines.analysis, {
+        const positions = await analyzePositions(game, app.engines.review, {
           depth, isCancelled: () => me.cancelled,
           onProgress: (d, t) => setProgress(k + d / t * 0.85, games.length),
         });
-        await refinePositions(game, positions, app.engines.analysis, { depth, isCancelled: () => me.cancelled });
+        await refinePositions(game, positions, app.engines.review, { depth, isCancelled: () => me.cancelled });
         report = buildReport(game, positions);
         saveReview({
           id, date: Date.now(), source: meta.source, url: meta.url,
@@ -94,7 +94,7 @@ export async function runBatch(app, games, { depth = 10, onOpen }) {
 
 export function cancelBatch(app) {
   if (job) job.cancelled = true;
-  app.engines.analysis.cancelAll();
+  app.engines.review.cancelAll();
 }
 
 function setProgress(done, total, label) {

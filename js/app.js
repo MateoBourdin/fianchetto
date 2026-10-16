@@ -2,7 +2,7 @@
 //  Fianchetto — point d'entrée
 // ============================================================
 
-import { Engine } from './core/engine.js';
+import { Engine, EnginePool, suggestedPoolSize } from './core/engine.js';
 import { buildOpeningIndex } from './core/openings.js';
 import { loadPieceSprite } from './ui/board.js';
 import { injectIconSprite } from './ui/icons.js';
@@ -21,6 +21,8 @@ export const engines = {
   analysis: new Engine(),  // classification en direct, rapports, problèmes
   live: new Engine(),      // lignes moteur continues de l'exploration
 };
+// Rapports : plusieurs moteurs en parallèle (le premier est engines.analysis)
+engines.review = new EnginePool(engines.analysis, { size: suggestedPoolSize() });
 
 export const app = {
   engines,

@@ -101,18 +101,20 @@ export class Engine {
     this._send(`setoption name MultiPV value ${job.multipv}`);
     if (job.skill != null) this._send(`setoption name Skill Level value ${job.skill}`);
     this._send(`position fen ${job.fen}`);
-    this._send(job.movetime ? `go movetime ${job.movetime}` : `go depth ${job.depth}`);
+    // depth + maxTime : Stockfish s'arrête à la première des deux limites atteinte
+    this._send(job.movetime ? `go movetime ${job.movetime}`
+      : job.maxTime ? `go depth ${job.depth} movetime ${job.maxTime}` : `go depth ${job.depth}`);
   }
 
   /**
    * Analyse une position.
    * @returns Promise<{bestmove, lines:[{uci, pv, cp|mate, depth}], depth}>
    */
-  async analyse(fen, { depth = 12, multipv = 1, movetime = null, skill = null, onInfo = null } = {}) {
+  async analyse(fen, { depth = 12, multipv = 1, movetime = null, maxTime = null, skill = null, onInfo = null } = {}) {
     await this.init();
     return new Promise((resolve, reject) => {
       this.queue.push({
-        fen, depth, multipv, movetime, skill, onInfo, resolve, reject,
+        fen, depth, multipv, movetime, maxTime, skill, onInfo, resolve, reject,
         blackToMove: fen.split(' ')[1] === 'b', lines: [], depthReached: 0,
       });
       this._next();
@@ -140,4 +142,56 @@ export class Engine {
     this.worker = null;
     this.readyPromise = null;
   }
+}
+
+/**
+ * Plusieurs moteurs Stockfish en parallèle (un Web Worker chacun) pour les
+ * rapports d'analyse : chaque moteur prend un bloc de positions consécutives,
+ * ce qui garde l'intérêt de sa table de transposition.
+ * Le premier moteur est celui de l'application ; les autres sont créés à la demande.
+ */
+export class EnginePool {
+  constructor(first, { size = 2, createEngine = () => new Engine() } = {}) {
+    this.engines = [first];
+    this.size = Math.max(1, size);
+    this.createEngine = createEngine;
+  }
+
+  /** Démarre les moteurs supplémentaires ; en cas d'échec on garde ceux qui marchent. */
+  async init() {
+    while (this.engines.length < this.size) this.engines.push(this.createEngine());
+    const ok = await Promise.all(this.engines.map((e) => e.init().then(() => true, () => false)));
+    this.engines = this.engines.filter((e, i) => ok[i] || i === 0);
+    return this.engines.length;
+  }
+
+  cancelAll() { this.engines.forEach((e) => e.cancelAll()); }
+
+  /** Traite items en blocs contigus répartis sur les moteurs ; renvoie les résultats dans l'ordre. */
+  async map(items, fn, { onProgress = null, isCancelled = () => false } = {}) {
+    await this.init();
+    const n = Math.min(this.engines.length, items.length) || 1;
+    const out = new Array(items.length);
+    let done = 0;
+    const chunk = Math.ceil(items.length / n);
+    await Promise.all(Array.from({ length: n }, async (_, k) => {
+      const eng = this.engines[k];
+      for (let i = k * chunk; i < Math.min(items.length, (k + 1) * chunk); i++) {
+        if (isCancelled()) throw new Error('cancelled');
+        out[i] = await fn(items[i], eng, i);
+        done++;
+        if (onProgress) onProgress(done, items.length);
+      }
+    }));
+    return out;
+  }
+}
+
+/** Nombre de moteurs conseillé selon l'appareil (cœurs, mémoire, mobile). */
+export function suggestedPoolSize() {
+  const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 2;
+  const mem = (typeof navigator !== 'undefined' && navigator.deviceMemory) || 4;
+  const mobile = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  const max = mobile || mem <= 2 ? 3 : 6;
+  return Math.max(1, Math.min(max, cores - 1));
 }
