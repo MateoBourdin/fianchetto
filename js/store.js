@@ -41,6 +41,14 @@ export function save() { safeSet(KEY, JSON.stringify(store)); }
 
 export function resetAll() {
   store.history.forEach((h) => safeDel(REVIEW_PREFIX + h.id));
+  // Efface aussi les rapports orphelins et tout ce qui a été ajouté au store (ex. dernier bilan)
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('fianchetto:')) safeDel(k);
+    }
+  } catch { /* stockage indisponible */ }
+  Object.keys(store).forEach((k) => { if (!(k in DEFAULTS)) delete store[k]; });
   Object.assign(store, JSON.parse(JSON.stringify(DEFAULTS)));
   save();
 }

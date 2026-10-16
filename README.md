@@ -116,6 +116,8 @@ node puzzles.build.mjs        # régénère et vérifie le pack de problèmes
 ```
 
 ## Licences et crédits
+Mentions légales, confidentialité et détail des licences : [`legal.html`](legal.html) (lien ⓘ en haut à droite de l'application).
+
 - Code de l'application, logo et jeu d'icônes : © Matéo Bourdin, sous licence **GPL-3.0** (voir `LICENSE`), imposée par l'intégration de Stockfish.
 - **Stockfish** via [stockfish.js](https://github.com/niklasf/stockfish.js) — GPL-3.0 (`vendor/stockfish/Copying.txt`). La redistribution du moteur implique de publier le code source du projet sous une licence compatible GPL si vous le distribuez.
 - **chess.js** 0.10.3 — BSD-2-Clause.
